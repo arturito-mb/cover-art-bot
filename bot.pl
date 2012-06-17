@@ -72,5 +72,9 @@ sub fetch_image {
 #	print "$r\n";
 	return 0 unless $r == "200";
 
+	my $format = `file "$filename"`;
+	print STDERR "Wrong format: $format" unless $format =~ /JPEG image data/;
+	return 0 unless $format =~ /JPEG image data/;
+
 	return $filename;
 }
