@@ -16,7 +16,8 @@ my $password = '';
 my $remove_note = "";
 my $verbose = 0;
 my $use_front = 0;
-GetOptions('note|n=s' => \$note, 'max|m=i' => \$max, 'tmpdir|t=s' => \$tmpdir, 'password|p=s' => \$password, 'remove-note|r=s' => \$remove_note, 'verbose|v' => \$verbose, 'use-front' => \$use_front);
+my $image_size = 0;
+GetOptions('note|n=s' => \$note, 'max|m=i' => \$max, 'tmpdir|t=s' => \$tmpdir, 'password|p=s' => \$password, 'remove-note|r=s' => \$remove_note, 'verbose|v' => \$verbose, 'use-front' => \$use_front, 'image-size|i=i' => \$image_size);
 
 my $file = shift @ARGV or die "Must provide a filename";
 my $username = shift @ARGV or die "Must provide a username";
@@ -57,7 +58,7 @@ for my $l (@mbids) {
 		}
 
 		my $rv = $bot->run($l, $filename);
-		
+
 		$max -= $rv;
 	}
 
@@ -76,6 +77,19 @@ sub fetch_image {
 	my $format = `file "$filename"`;
 	print STDERR "Wrong format: $format" unless $format =~ /JPEG image data/;
 	return 0 unless $format =~ /JPEG image data/;
+
+	if ($image_size) {
+		my $info = `identify "$filename"`;
+		if ($info =~ / JPEG ([0-9]+)x([0-9]+) /) {
+			if ($1 < $image_size || $2 < $image_size) {
+				print STDERR "Image too small: $1x$2\n";
+				return 0;
+			}
+		} else {
+			print STDERR "Could not determine image dimensions: $info";
+			return 0;
+		}
+	}
 
 	return $filename;
 }

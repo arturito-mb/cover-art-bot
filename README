@@ -21,5 +21,6 @@ Options:
 -r --remove-note: edit note to use when removing a relationship
 -v --verbose: be chatty (default: not very talkative)
    --use-front: use the front instead of the index to determine cover art presence
+-i --image-size: minimum height/width of the image (requires ImageMagick)
 
 Right now it will only upload images if there isn't any cover art already. This may or may not ever get fixed.
