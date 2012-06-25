@@ -16,6 +16,9 @@ case $1 in
 		psql -qtA -F $'\t' musicbrainz < liveweb2.sql > /tmp/data-liveweb2 && perl bot.pl --max=$MAX --note="Added from existing liveweb.archive.org cover art relationship. The release has only one cover art relationship and the URL is only linked to one release. Image size is at least 500x500." --remove-note="Added to CAA from existing liveweb.archive.org cover art relationship. The release has only one cover art relationship and the URL is only linked to one release. Image size is at least 500x500." --image-size=500 /tmp/data-liveweb2 arturito
 	;;
 
+	wwwarchiveorg )
+		psql -qtA -F $'\t' musicbrainz < $1.sql > /tmp/data-$1 && perl bot.pl --max=$MAX --note="Added from existing www.archive.org cover art relationship. The release has only one cover art relationship and the URL is only linked to one release. Image size is at least 500x500. The release has a free download relationship for the same directory as the image and the format is digital media." --remove-note="Added to CAA from existing www.archive.org cover art relationship. The release has only one cover art relationship and the URL is only linked to one release. Image size is at least 500x500. The release has a free download relationship for the same directory as the image and the format is digital media." --image-size=500 /tmp/data-$1 arturito
+	;;
 
 	* )
 		echo "Nothing to do"
