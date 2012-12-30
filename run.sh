@@ -32,6 +32,10 @@ case $1 in
 		psql -qtA -F $'\t' musicbrainz < $1.sql > /tmp/data-$1 && perl bot.pl --max=$MAX --note="Added from existing web.archive.org cover art relationship (URL: {\$url}). The release has only one cover art relationship and the URL is only linked to one release. Image size is at least 250x250 (actual dimensions: {\$x_dim}x{\$y_dim})." --remove-note="Added to CAA from existing web.archive.org cover art relationship (URL: {\$url}). The release has only one cover art relationship and the URL is only linked to one release. Image size is at least 250x250 (actual dimensions: {\$x_dim}x{\$y_dim})." --image-size=250 /tmp/data-$1 arturito
 	;;
 
+	jamendo )
+		psql -qtA -F $'\t' musicbrainz < $1.sql > /tmp/data-$1 && perl bot.pl --max=$MAX --use-front --note="Image fetched from existing Jamendo download relationship. The release format is digital media. The label is Jamendo and the cat# matches the URL. The release has no other URL relationships (ignoring license URLs) and the URL is only linked to one release. Image dimensions: {\$x_dim}x{\$y_dim}." --image-size=100 /tmp/data-$1 arturito
+	;;
+
 	* )
 		echo "Nothing to do"
 	;;

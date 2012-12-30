@@ -98,6 +98,8 @@ for my $l (@mbids) {
 sub fetch_image {
 	my $url = shift;
 
+	$url = get_image_url($url);
+
 	return 0 unless $url =~ /\/([^\/]+)$/;
 	my $filename = $tmpdir.$1;
 	my $r = getstore($url, "$filename");
@@ -176,4 +178,25 @@ sub archiveorg {
 		}
 		return 0;
 	} else { return 0; }
+}
+
+sub get_image_url {
+	my $url = shift;
+	my $image_url = "";
+
+	if ($url =~ /^http:\/\/magnatune.com\/artists\/albums\/([0-9a-z-]+)\/$/) {
+		my $data = get($url);
+		if ($data =~ /<meta property="og:image" content="(.*?)"\/>/) {
+			$image_url = $1;
+			$image_url =~ s/cover_600.jpg/cover.jpg/;
+		} else {
+			return 0;
+		}
+	} elsif ($url =~ /^http:\/\/www\.jamendo\.com\/(?:album\/|list\/a)(([0-9]{0,3})([0-9]{3}))$/) {
+		my $a = $2 || 0;
+		$image_url = "http://imgjam.com/albums/s$a/$1/covers/1.0.jpg";
+	}
+
+	return $image_url if $image_url;
+	return $url;
 }
