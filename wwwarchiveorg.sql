@@ -1,5 +1,5 @@
 SET search_path TO musicbrainz;
-SELECT r.gid, url.url, NULL, NULL, lru.id
+SELECT DISTINCT r.gid, url.url, NULL, NULL, lru.id, lru.last_updated
 FROM url
 JOIN l_release_url lru ON lru.entity1 = url.id
 JOIN release r ON r.id = lru.entity0
@@ -14,12 +14,12 @@ JOIN url url2 ON url2.id=lru2.entity1
 JOIN medium m on m.release = r.id
 JOIN medium_format mf on mf.id = m.format
 
-WHERE url.url ~ E'^http://www.archive.org/download/.*.jpg$'
+WHERE url.url ~* E'^http://www.archive.org/download/.*.jpe?g$'
 AND lt.name = 'cover art link'
 AND lru.edits_pending = 0
 
-AND lt2.name = 'download for free'
-AND url2.url = regexp_replace(url.url, 'http://www.archive.org/download/([^/]+)/.*', E'http://www.archive.org/details/\\1')
+AND (lt2.name = 'download for free' or lt2.name = 'creative commons licensed download')
+AND regexp_replace(url2.url, 'http://archive.org/', 'http://www.archive.org/') = regexp_replace(url.url, 'http://www.archive.org/download/([^/]+)/.*', E'http://www.archive.org/details/\\1')
 
 AND mf.name = 'Digital Media'
 
