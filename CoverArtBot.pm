@@ -3,6 +3,7 @@
 package CoverArtBot;
 use utf8;
 use WWW::Mechanize;
+use Text::Template qw(fill_in_string);
 
 sub new {
 	my ($package, $args) = @_;
@@ -30,6 +31,7 @@ sub precheck {
 	$self->{'rel'} = $l->{'rel'};
 	$self->{'types'} = $l->{'types'} || "Front";
 	$self->{'comment'} = $l->{'comment'};
+	$self->{'note_args'} = $l->{'note_args'};
 
 	return 1 if $self->{'precheck'}->{ $self->{'mbid'} };
 
@@ -80,7 +82,7 @@ sub cover_exists {
 	return 0 if $self->{'releases'}->{ $self->{'mbid'} };
 
 	my $url = "http://coverartarchive.org/release/" . $self->{'mbid'};
-	my $url = $url . "/front" if $self->{'use_front'};
+	$url .= "/front" if $self->{'use_front'};
 
 	if ($self->load_url($url)) {
 		return 1;
@@ -108,7 +110,9 @@ sub remove_relationship {
 	my ($self) = @_;
 	my $mech = $self->{'mech'};
 	my $url = "http://".$self->{'server'}."/edit/relationship/delete?returnto=&type1=url&type0=release&id=".$self->{'rel'};
-	my $r = $mech->post($url, {'confirm.edit_note' => $self->{'remove_note'}});
+	my $note = fill_in_string($self->{'remove_note'}, HASH => $self->{'note_args'});
+	print "Relationship Removal Edit Note: ".$note."\n" if $self->{'verbose'};
+	my $r = $mech->post($url, {'confirm.edit_note' => $note});
 	if ($r->is_success) {
 		return 1;
 	}
@@ -164,7 +168,7 @@ sub add_cover_art {
 
 	# submit edit
 	$mech->form_id("add-cover-art");
-	my %types = ( "Front" => 1, "Back" => 2, "Booklet" => 3, "Medium" => 4, "Obi" => 5, "Spine" => 6, "Track" => 7, "Other" => 8 );
+	my %types = ( "Front" => 1, "Back" => 2, "Booklet" => 3, "Medium" => 4, "Obi" => 5, "Spine" => 6, "Track" => 7, "Other" => 8, "Tray" => 9, "Sticker" => 10 );
 	if ($self->{'types'} ne "None") {
 		my @types = map { $types{$_} } split /,/, $self->{'types'};
 		print "Selecting types ", join (",", @types), "\n" if $self->{'verbose'};
@@ -178,7 +182,9 @@ sub add_cover_art {
 	if ($mech->find_all_inputs(type => 'checkbox', name=>'add-cover-art.as_auto_editor')) {
 		$mech->untick("add-cover-art.as_auto_editor", "1");
 	}
-	$mech->field("add-cover-art.edit_note", $self->{'note'});
+	my $note = fill_in_string($self->{'note'}, HASH => $self->{'note_args'});
+	print "Edit Note: ".$note."\n" if $self->{'verbose'};
+	$mech->field("add-cover-art.edit_note", $note);
 	$mech->submit();
 
 	print $mech->uri, "\n" if $self->{'verbose'};
