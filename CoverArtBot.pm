@@ -61,6 +61,12 @@ sub run {
 	$self->{'filename'} = $filename;
 	print "Filename: ".$self->{'filename'}."\n" if $self->{'verbose'};
 
+	my $md5 = `md5sum "$filename"`;
+	print STDERR "Jamendo placeholder\n" if $md5 =~ /^1276407237f71cf969456063cfb56c61  /;
+	return 0 if $md5 =~ /^1276407237f71cf969456063cfb56c61  /;
+	print STDERR "Beatport placeholder\n" if $md5 =~ /^a0a7dd97e35ecd6b5092fb56e418de3c  /;
+	return 0 if $md5 =~ /^a0a7dd97e35ecd6b5092fb56e418de3c  /;
+
 	print "pre-checking complete, uploading...\n" if $self->{'verbose'};
 
 	if (!$self->add_cover_art) {
