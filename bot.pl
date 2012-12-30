@@ -13,7 +13,7 @@ use XML::Simple qw(:strict);
 
 my $note = "";
 my $max = 100;
-my $tmpdir = "/tmp/";
+my $tmpdir = "/tmp/arturito/";
 my $password = '';
 my $remove_note = "";
 my $verbose = 0;
