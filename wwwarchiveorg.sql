@@ -14,7 +14,7 @@ JOIN url url2 ON url2.id=lru2.entity1
 JOIN medium m on m.release = r.id
 JOIN medium_format mf on mf.id = m.format
 
-WHERE url.url ~* E'^http://www.archive.org/download/.*.jpe?g$'
+WHERE url.url ~* E'^http://(www.)?archive.org/download/.*.jpe?g$'
 AND lt.name = 'cover art link'
 AND lru.edits_pending = 0
 

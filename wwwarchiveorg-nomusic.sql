@@ -6,7 +6,7 @@ JOIN release r ON r.id = lru.entity0
 JOIN link l ON l.id = lru.link
 JOIN link_type lt ON lt.id = l.link_type
 
-WHERE url.url ~* E'^http://www.archive.org/download/.*.jpe?g$'
+WHERE url.url ~* E'^http://(www.)?archive.org/download/.*.jpe?g$'
 AND lt.name = 'cover art link'
 AND lru.edits_pending = 0
 
