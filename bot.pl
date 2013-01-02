@@ -10,6 +10,7 @@ use LWP::Simple;
 use Getopt::Long;
 use File::Which;
 use XML::Simple qw(:strict);
+use JSON;
 
 my $note = "";
 my $max = 100;
@@ -195,6 +196,23 @@ sub get_image_url {
 	} elsif ($url =~ /^http:\/\/www\.jamendo\.com\/(?:album\/|list\/a)(([0-9]{0,3})([0-9]{3}))$/) {
 		my $a = $2 || 0;
 		$image_url = "http://imgjam.com/albums/s$a/$1/covers/1.0.jpg";
+	} elsif ($url =~ /^http:\/\/www.beatport.com\/release\/[a-z0-9-]+\/([0-9]+)$/) {
+		my $dataj = get("http://api.beatport.com/catalog/3/beatport/release?id=$1");
+		my $data = decode_json($dataj);
+
+		my $url = "";
+		my $max = 0;
+		my $maxsize = "";
+		for my $size (keys %{ $data->{'results'}->{'release'}->{'images'} }) {
+			if ($max < $data->{'results'}->{'release'}->{'images'}->{$size}->{'width'}) {
+				$url = $data->{'results'}->{'release'}->{'images'}->{$size}->{'url'};
+				$max = $data->{'results'}->{'release'}->{'images'}->{$size}->{'width'};
+				$maxsize = $size;
+			}
+		}
+		$image_url = $url if $url;
+		return 0 if $url eq "http://geo-media.beatport.com/image/5245821.jpg"; # Placeholder
+
 	}
 
 	return $image_url if $image_url;
