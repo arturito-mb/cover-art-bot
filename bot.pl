@@ -212,7 +212,20 @@ sub get_image_url {
 		}
 		$image_url = $url if $url;
 		return 0 if $url eq "http://geo-media.beatport.com/image/5245821.jpg"; # Placeholder
+	} elsif ($url =~ /^https?:\/\/itunes.apple.com\/(?:([a-z]{2})\/)?album\/(?:[a-z0-9.-]+\/)?id([0-9]+)$/) {
+		my $wsurl = "http://itunes.apple.com/lookup?id=$2&entity=album";
+		$wsurl .= "&country=$1" if $1;
 
+		my $dataj = get($wsurl);
+		my $data = from_json($dataj);
+
+		if ($data->{'resultCount'} > 0) {
+			$image_url = $data->{'results'}->[0]->{'artworkUrl100'};
+			$image_url =~ s/.100x100-75.jpg$/.600x600-75.jpg/;
+			$image_url =~ s/.600x600-75.jpg/.jpg/ if $image_url =~ /\/Features\//;
+		} else {
+			return 0;
+		}
 	}
 
 	return $image_url if $image_url;
