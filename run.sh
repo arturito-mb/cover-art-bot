@@ -44,6 +44,10 @@ case $1 in
 		psql -qtA -F $'\t' musicbrainz < $1.sql > /tmp/data-$1 && perl bot.pl --max=$MAX --use-front --note="Image fetched from existing iTunes download relationship. The release format is digital media. The release has no other URL relationships (ignoring license URLs) and the URL is only linked to one release. Image dimensions: {\$x_dim}x{\$y_dim}." --image-size=100 /tmp/data-$1 arturito
 	;;
 
+	amazoncn )
+		psql -qtA -F $'\t' musicbrainz < $1.sql > /tmp/data-$1 && perl bot.pl --max=$MAX --use-front --note="Image fetched from existing ASIN relationship for Amazon.cn. The release has no other URL relationships (ignoring license URLs) and the URL is only linked to one release. Image dimensions: {\$x_dim}x{\$y_dim}." --image-size=100 /tmp/data-$1 arturito
+	;;
+
 	* )
 		echo "Nothing to do"
 	;;

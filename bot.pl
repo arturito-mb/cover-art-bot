@@ -226,6 +226,16 @@ sub get_image_url {
 		} else {
 			return 0;
 		}
+        } elsif ($url =~ /^http:\/\/www.amazon.cn\/gp\/product\/[0-9A-Z]{10}$/) {
+                my $data = get($url);
+                $image_url = $1 if $data =~ /prodImageCell.*src="([^"]+)"/;
+                $image_url = $1 if $data =~ /"largeImage":"([^"]+)"/;
+                $image_url = $1 if $data =~ /"originalLargeImage":"([^"]+)"/;
+                $image_url = $1 if $data =~ /"hiResImage":"([^"]+)"/;
+		print STDERR "$image_url\n";
+                $image_url =~ s/\.(_[A-Z]{2}[0-9]{3,})+_\.jpg$/.jpg/;
+		print STDERR "$image_url\n";
+		return 0 unless $image_url;
 	}
 
 	return $image_url if $image_url;
